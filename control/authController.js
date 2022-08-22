@@ -23,7 +23,7 @@ class AuthController {
                .json({ message: "Ошибка при регистрации", errors });
          }
          const { username, password } = req.body;
-         //  console.log(req.body);
+          console.log(req.body);
          const candidate = await User.findOne({ username });
          if (candidate) {
             return res
@@ -42,7 +42,7 @@ class AuthController {
          return res.json({ message: "Пользователь успешно зарегистрирован" });
       } catch (er) {
          console.log(er);
-         res.status(400).json({ message: "Registratiton error" });
+         res.status(400).json({ message: "Registratiton error2" });
       }
    }
 
@@ -75,7 +75,7 @@ class AuthController {
          return res.json(users);
       } catch (er) {
          console.log(er);
-         res.status(400).json({ message: "getUsers error" });
+         // res.status(400).json({ message: "getUsers error" });
       }
    }
 }
