@@ -61,8 +61,8 @@ class AuthController {
                message: `Пользователю ${username} нужно вспомнить пароль хи-хи`,
             });
          }
-         const token = generateAccessToken(user._id, user.roles);
-         return res.json({ token });
+         const access = generateAccessToken(user._id, user.roles);
+         return res.json({ access });
       } catch (er) {
          console.log(er);
          res.status(400).json({ message: "Login error" });

@@ -1,6 +1,8 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const authRouter = require("./routes/authRouter");
+const conversationRouter = require("./routes/conversationsRouter");
+const messageRouter = require("./routes/messageRouter");
 const cors = require("cors");
 const PORT = process.env.PORT || 5000;
 
@@ -8,7 +10,10 @@ const app = express();
 
 app.use(cors({ origin: "http://localhost:3000" }));
 app.use(express.json());
+
 app.use("/api", authRouter);
+app.use("/api/conversation", conversationRouter);
+app.use("/api/message", messageRouter);
 
 const start = async () => {
    try {
