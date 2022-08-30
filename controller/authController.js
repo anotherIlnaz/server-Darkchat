@@ -23,7 +23,6 @@ class AuthController {
                .json({ message: "Ошибка при регистрации", errors });
          }
          const { username, password } = req.body;
-          console.log(req.body);
          const candidate = await User.findOne({ username });
          if (candidate) {
             return res
@@ -75,7 +74,19 @@ class AuthController {
          return res.json(users);
       } catch (er) {
          console.log(er);
-         // res.status(400).json({ message: "getUsers error" });
+         res.status(400).json({ message: "getUsers error" });
+      }
+   }
+
+   async getUserMe(req, res) {
+      try {
+         const userId = req.user.id;
+         const userMe = await User.findById(userId);
+         console.log(userId);
+         return res.status(200).json({id:userMe._id, role: userMe.roles, username: userMe.username});
+      } catch (er) {
+         console.log(er);
+         res.status(400).json({ message: "getUsers error" });
       }
    }
 }

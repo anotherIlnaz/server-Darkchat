@@ -2,12 +2,14 @@ const jwt = require("jsonwebtoken");
 const { secret } = require("../config");
 
 module.exports = function (req, res, next) {
-   if (req.method === "OPTIONS") {
+   if (req.method=== "OPTIONS") {
       next();
    }
    try {
+      // console.log(req.headers.authorization);
+      // console.log(req.headers);
+
       const token = req.headers.authorization.split(" ")[1];
-      console.log(req.headers.authorization);
       if (!token) {
          return res
             .status(403)
