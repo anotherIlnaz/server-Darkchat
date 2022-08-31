@@ -1,9 +1,10 @@
 const router = require("express").Router();
+const authMiddleware = require("../middleware/authMiddleware");
 const Message = require("../models/Message");
 const User = require("../models/User");
-// add
-router.post("/", async (req, res) => {
-   const newMessage = new Message(req.body);
+
+router.post("/", authMiddleware, async (req, res) => {
+   const newMessage = new Message({ ...req.body, sender: req.userId });
    try {
       const sevedMessage = await newMessage.save();
       res.status(200).json(sevedMessage);
@@ -12,7 +13,6 @@ router.post("/", async (req, res) => {
    }
 });
 
-// get
 const prepareMessages = async (message) => {
    const senderId = message.sender;
    const senderData = await User.findById(senderId);
@@ -28,6 +28,7 @@ const prepareMessages = async (message) => {
       },
    };
 };
+
 router.get("/:conversationId", async (req, res) => {
    try {
       const messages = await Message.find({

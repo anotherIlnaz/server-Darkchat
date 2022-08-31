@@ -83,7 +83,13 @@ class AuthController {
          const userId = req.user.id;
          const userMe = await User.findById(userId);
          console.log(userId);
-         return res.status(200).json({id:userMe._id, role: userMe.roles, username: userMe.username});
+         return res
+            .status(200)
+            .json({
+               id: userMe._id,
+               role: userMe.roles,
+               username: userMe.username,
+            });
       } catch (er) {
          console.log(er);
          res.status(400).json({ message: "getUsers error" });
