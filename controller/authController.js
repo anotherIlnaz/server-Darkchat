@@ -82,7 +82,6 @@ class AuthController {
       try {
          const userId = req.user.id;
          const userMe = await User.findById(userId);
-         console.log(userId);
          return res
             .status(200)
             .json({

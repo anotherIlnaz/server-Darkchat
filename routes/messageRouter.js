@@ -36,8 +36,9 @@ router.get("/:conversationId", async (req, res) => {
       });
 
       const preparedMessages = await Promise.all(
-         messages.map(async (message) => await prepareMessages(message))
+         messages.map(async (message) =>await prepareMessages(message))
       );
+      
       res.status(200).json(preparedMessages);
    } catch (error) {
       res.status(500).json(error);

@@ -20,8 +20,38 @@ const io = require("socket.io")(httpServer, {
    },
 });
 
+let users = [];
+
+const addUser = (userId, socketId) => {
+   !users.some((user) => user.userId === userId) &&
+      userId &&
+      users.push({ userId: userId, socketId: socketId });
+};
+
+const removeUser = (socketId) => {
+   users = users.filter((user) => {
+      return user.socketId !== socketId; // чем user.socketId !== socketId отличается от user.socketId === !socketId, ааа, !socketId приводит к булевому значению? это называется ?
+   });
+};
+
 io.on("connection", (socket) => {
+   //  when connect
    console.log("A user connected.");
+
+   // take user id and socket id from client, and after adding filtered user object in users array , send users array back
+   socket.on("addUser", (userId) => {
+      addUser(userId, socket.id);
+      io.emit("getUsers", users);
+   });
+
+   // send and get message
+
+   // when disconnect
+   socket.on("disconnect", () => {
+      console.log("User is disconnected.");
+      removeUser(socket.id);
+      io.emit("getUsers", users);
+   });
 });
 
 app.use(cors({ origin: "http://localhost:3000" }));
