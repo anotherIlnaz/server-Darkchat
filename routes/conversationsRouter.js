@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const Conversation = require("../models/Conversation");
+const Message = require("../models/Message");
 const User = require("../models/User");
 
 // new conv
@@ -21,6 +22,7 @@ router.post("/", async (req, res) => {
 const prepareConv = async (conv, userId) => {
    const companionId = conv.members.find((id) => id !== userId);
 
+   const lastMessage = await Message.find({ conversationId: conv._id });
    const companionData = await User.findById(companionId);
 
    return {

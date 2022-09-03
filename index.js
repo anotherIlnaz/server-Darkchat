@@ -30,8 +30,12 @@ const addUser = (userId, socketId) => {
 
 const removeUser = (socketId) => {
    users = users.filter((user) => {
-      return user.socketId !== socketId; // чем user.socketId !== socketId отличается от user.socketId === !socketId, ааа, !socketId приводит к булевому значению? это называется ?
+      return user.socketId !== socketId;
    });
+};
+
+const getUser = (userId) => {
+   return users.find((user) => user.userId === userId);
 };
 
 io.on("connection", (socket) => {
@@ -45,6 +49,13 @@ io.on("connection", (socket) => {
    });
 
    // send and get message
+   // socket.on("sendMessage", ({ senderId, receiverId, text }) => {
+   //    const user = getUser(receiverId); 
+   //    io.to(user.socketId).emit("getMessage", {
+   //       receiverId,
+   //       text,
+   //    });
+   // });
 
    // when disconnect
    socket.on("disconnect", () => {

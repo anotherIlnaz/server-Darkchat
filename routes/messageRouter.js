@@ -3,16 +3,6 @@ const authMiddleware = require("../middleware/authMiddleware");
 const Message = require("../models/Message");
 const User = require("../models/User");
 
-router.post("/", authMiddleware, async (req, res) => {
-   const newMessage = new Message({ ...req.body, sender: req.userId });
-   try {
-      const sevedMessage = await newMessage.save();
-      res.status(200).json(sevedMessage);
-   } catch (error) {
-      res.status(500).json(error);
-   }
-});
-
 const prepareMessages = async (message) => {
    const senderId = message.sender;
    const senderData = await User.findById(senderId);
@@ -29,6 +19,24 @@ const prepareMessages = async (message) => {
    };
 };
 
+router.post("/", authMiddleware, async (req, res) => {
+   console.log(req.body);
+   const newMessage = new Message({
+      ...req.body,
+      sender: req.user.id,
+      conversationId: req.body.convId,
+   });
+   console.log(newMessage)
+   try {
+      const savedMessage = await newMessage.save();
+      const preparedMessage = await prepareMessages(savedMessage);
+
+      res.status(200).json(preparedMessage);
+   } catch (error) {
+      res.status(500).json(error);
+   }
+});
+
 router.get("/:conversationId", async (req, res) => {
    try {
       const messages = await Message.find({
@@ -36,9 +44,9 @@ router.get("/:conversationId", async (req, res) => {
       });
 
       const preparedMessages = await Promise.all(
-         messages.map(async (message) =>await prepareMessages(message))
+         messages.map(async (message) => await prepareMessages(message))
       );
-      
+
       res.status(200).json(preparedMessages);
    } catch (error) {
       res.status(500).json(error);
