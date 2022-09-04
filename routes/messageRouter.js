@@ -20,13 +20,11 @@ const prepareMessages = async (message) => {
 };
 
 router.post("/", authMiddleware, async (req, res) => {
-   console.log(req.body);
    const newMessage = new Message({
       ...req.body,
       sender: req.user.id,
       conversationId: req.body.convId,
    });
-   console.log(newMessage)
    try {
       const savedMessage = await newMessage.save();
       const preparedMessage = await prepareMessages(savedMessage);

@@ -21,6 +21,7 @@ const io = require("socket.io")(httpServer, {
 });
 
 let users = [];
+console.log(users);
 
 const addUser = (userId, socketId) => {
    !users.some((user) => user.userId === userId) &&
@@ -40,26 +41,30 @@ const getUser = (userId) => {
 
 io.on("connection", (socket) => {
    //  when connect
-   console.log("A user connected.");
+   console.log(`A user ${socket.id} connected.`);
 
    // take user id and socket id from client, and after adding filtered user object in users array , send users array back
    socket.on("addUser", (userId) => {
+      // console.log(userId);
       addUser(userId, socket.id);
-      io.emit("getUsers", users);
-   });
+      io.emit("getUsers", users)
+      // console.log(users)
+   })
 
    // send and get message
-   // socket.on("sendMessage", ({ senderId, receiverId, text }) => {
-   //    const user = getUser(receiverId); 
-   //    io.to(user.socketId).emit("getMessage", {
-   //       receiverId,
-   //       text,
-   //    });
-   // });
+   socket.on("sendMessage", ({ senderId, receiverId, text }) => {
+      // console.log(receiverId);
+      const user = getUser(receiverId);
+      console.log(user); //undefined
+      // io.to(user.socketId).emit("getMessage", {
+      //    receiverId,
+      //    text,
+      // })
+   })
 
    // when disconnect
    socket.on("disconnect", () => {
-      console.log("User is disconnected.");
+      console.log(`User ${socket.id} is disconnected.`);
       removeUser(socket.id);
       io.emit("getUsers", users);
    });

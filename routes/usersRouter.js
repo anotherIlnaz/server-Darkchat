@@ -6,7 +6,6 @@ router.get("/", async (req, res) => {
    try {
       const userId = req.query.userId;
       const user = await User.findById(userId);
-      console.log(userId);
       return res
          .status(200)
          .json({ id: user._id, role: user.roles, username: user.username });
