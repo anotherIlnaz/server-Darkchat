@@ -2,7 +2,10 @@ const express = require("express");
 const mongoose = require("mongoose");
 const authRouter = require("./routes/authRouter");
 const conversationRouter = require("./routes/conversationsRouter");
-const messageRouter = require("./routes/messageRouter");
+const {
+   router: messageRouter,
+   sendMessage,
+} = require("./routes/messageRouter");
 const usersRouter = require("./routes/usersRouter");
 const cors = require("cors");
 const PORT = process.env.PORT || 5000;
@@ -21,7 +24,6 @@ const io = require("socket.io")(httpServer, {
 });
 
 let users = [];
-console.log(users);
 
 const addUser = (userId, socketId) => {
    !users.some((user) => user.userId === userId) &&
@@ -47,20 +49,25 @@ io.on("connection", (socket) => {
    socket.on("addUser", (userId) => {
       // console.log(userId);
       addUser(userId, socket.id);
-      io.emit("getUsers", users)
+      io.emit("getUsers", users);
       // console.log(users)
-   })
+   });
 
    // send and get message
-   socket.on("sendMessage", ({ senderId, receiverId, text }) => {
-      // console.log(receiverId);
-      const user = getUser(receiverId);
-      console.log(user); //undefined
-      // io.to(user.socketId).emit("getMessage", {
-      //    receiverId,
-      //    text,
-      // })
-   })
+   socket.on("sendMessage", async ({ senderId, receiverId, text, convId }) => {
+      const preparedMessage = await sendMessage(senderId, convId, text);
+
+      const receiver = getUser(receiverId);
+      const sender = getUser(senderId);
+
+      if (receiver?.socketId) {
+         io.to(receiver.socketId).emit("getMessage", preparedMessage);
+      }
+
+      if (sender?.socketId) {
+         io.to(sender.socketId).emit("getMessage", preparedMessage);
+      }
+   });
 
    // when disconnect
    socket.on("disconnect", () => {

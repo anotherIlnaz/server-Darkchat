@@ -1,4 +1,5 @@
 const router = require("express").Router();
+const authMiddleware = require("../middleware/authMiddleware");
 const Conversation = require("../models/Conversation");
 const Message = require("../models/Message");
 const User = require("../models/User");
@@ -36,9 +37,9 @@ const prepareConv = async (conv, userId) => {
    };
 };
 
-router.get("/:userId", async (req, res) => {
+router.get("/all", authMiddleware, async (req, res) => {
    try {
-      const userId = req.params.userId;
+      const userId = req.user.id;
 
       const conversations = await Conversation.find({
          members: {
@@ -51,6 +52,20 @@ router.get("/:userId", async (req, res) => {
       return res.status(200).json(preparedConversations);
    } catch (error) {
       console.log(error);
+      res.status(500).json(error);
+   }
+});
+
+router.get("/:convId", authMiddleware, async (req, res) => {
+   try {
+      const convId = req.params.convId;
+
+      const conversation = await Conversation.findById(convId);
+
+      const preparedConversation = await prepareConv(conversation, req.user.id);
+
+      return res.status(200).json(preparedConversation);
+   } catch (error) {
       res.status(500).json(error);
    }
 });

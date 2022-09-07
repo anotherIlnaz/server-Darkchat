@@ -14,20 +14,36 @@ const prepareMessages = async (message) => {
 
       sender: {
          id: message._id,
-         username: senderData.username,
+         username: senderData?.username,
       },
    };
 };
 
-router.post("/", authMiddleware, async (req, res) => {
+async function sendMessage(userId, convId, message) {
    const newMessage = new Message({
-      ...req.body,
-      sender: req.user.id,
-      conversationId: req.body.convId,
+      text: message,
+      sender: userId,
+      conversationId: convId,
    });
+
    try {
       const savedMessage = await newMessage.save();
       const preparedMessage = await prepareMessages(savedMessage);
+
+      return preparedMessage;
+   } catch (error) {
+      console.log(error);
+      throw error;
+   }
+}
+
+router.post("/", authMiddleware, async (req, res) => {
+   try {
+      const preparedMessage = await sendMessage(
+         req.user.id,
+         req.body.convId,
+         req.body.text
+      );
 
       res.status(200).json(preparedMessage);
    } catch (error) {
@@ -51,4 +67,4 @@ router.get("/:conversationId", async (req, res) => {
    }
 });
 
-module.exports = router;
+module.exports = { router, sendMessage };
